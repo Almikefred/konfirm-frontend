@@ -83,26 +83,29 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-lo);
+  border: none;
+  /* Deliberately the same high-contrast pairing as .btn-primary, not the
+     subtle --surface/--border/--text-lo chrome tokens -- a control that's
+     supposed to be always-discoverable can't use tokens tuned for quiet
+     background chrome. Verified visually in both themes, not assumed. */
+  background: var(--accent);
+  color: var(--accent-ink);
   cursor: pointer;
   position: fixed;
   bottom: 16px;
   right: 16px;
   z-index: 40;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
 }
 .theme-toggle:hover {
-  border-color: var(--accent);
-  color: var(--text-hi);
+  opacity: 0.88;
 }
 .theme-toggle svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
 }
 
 * {
