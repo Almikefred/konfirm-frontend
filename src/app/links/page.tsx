@@ -117,84 +117,79 @@ export default function LinksPage() {
   );
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-8">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">My payment links</h1>
-        <Link
-          href="/new"
-          className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
-        >
-          New payment link
-        </Link>
+    <div className="wrap">
+      <div className="header-row">
+        <div className="brand">
+          <span className="mark">✓</span> Konfirm
+        </div>
+        <div className="nav">
+          <Link href="/activity">Activity</Link>
+          <Link href="/new">+ New payment</Link>
+        </div>
       </div>
+      <h1>My payment links</h1>
+      <p className="sub">Every link you&apos;ve created, and whether it can still be paid.</p>
 
       {error && (
-        <div
-          role="alert"
-          className="mb-4 rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700"
-        >
+        <div role="alert" className="callout" style={{ borderColor: "var(--error)", color: "var(--error)" }}>
           {error}
         </div>
       )}
 
       {loading ? (
-        <p className="text-sm text-gray-500">Loading links…</p>
+        <div className="empty">Loading links…</div>
       ) : links.length === 0 ? (
-        <div className="rounded-md border border-gray-200 px-4 py-8 text-center text-sm text-gray-500">
-          You haven&apos;t created any payment links yet.
+        <div className="empty">
+          No payment links yet.
+          <br />
+          <Link href="/new" className="btn-primary" style={{ marginTop: 16 }}>
+            Create a payment link
+          </Link>
         </div>
       ) : (
-        <ul className="space-y-3">
+        <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
           {links.map((link) => (
-            <li
-              key={link.id}
-              className="rounded-md border border-gray-200 px-4 py-3"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <p className="text-base font-medium">{formatAmount(link.amount)}</p>
-                  {link.description && (
-                    <p className="text-sm text-gray-600">{link.description}</p>
-                  )}
-                  <p className="text-xs text-gray-400">
+            <li key={link.id} className="payment" style={{ flexDirection: "column", alignItems: "stretch" }}>
+              <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 12 }}>
+                <div className="desc">
+                  <div className="amount" style={{ fontSize: 16 }}>{formatAmount(link.amount)}</div>
+                  {link.description && <div>{link.description}</div>}
+                  <div className="from">
                     Created {formatDate(link.createdAt)}
                     {!link.active && (
-                      <span className="ml-2 rounded bg-gray-200 px-2 py-0.5 text-gray-700">
+                      <span className="status-pill inactive" style={{ marginLeft: 8 }}>
                         Inactive
                       </span>
                     )}
-                  </p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => void handleCopy(link)}
-                    className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-medium hover:bg-gray-50"
-                  >
-                    {copiedId === link.id ? 'Copied!' : 'Copy link'}
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <button type="button" className="btn-secondary" onClick={() => void handleCopy(link)}>
+                    {copiedId === link.id ? "Copied!" : "Copy link"}
                   </button>
                   {link.active && (
                     <button
                       type="button"
+                      className="btn-secondary"
+                      style={{ color: "var(--error)", borderColor: "var(--error)" }}
                       onClick={() => void handleDeactivate(link)}
                       disabled={deactivatingId === link.id}
-                      className="rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-50"
                     >
-                      {deactivatingId === link.id ? 'Deactivating…' : 'Deactivate'}
+                      {deactivatingId === link.id ? "Deactivating…" : "Deactivate"}
                     </button>
                   )}
                 </div>
               </div>
-              <p className="mt-2 break-all font-mono text-xs text-gray-700">{link.url}</p>
+              <div className="from mono" style={{ wordBreak: "break-all", marginTop: 8 }}>{link.url}</div>
               {copyErrorId === link.id && (
-                <p className="mt-1 text-xs text-red-600">
-                  Couldn&apos;t copy automatically. Select the URL above and copy it manually.
-                </p>
+                <div className="from" style={{ color: "var(--error)" }}>
+                  Couldn&apos;t copy automatically — select the link above and copy it manually.
+                </div>
               )}
             </li>
           ))}
         </ul>
       )}
-    </main>
+    </div>
   );
 }

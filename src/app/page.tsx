@@ -40,13 +40,12 @@ export default async function RootPage() {
       </nav>
 
       <section className="landing-hero">
-        <div className="hero-glow" />
         <span className="landing-badge">Testnet · Pre-launch</span>
-        <h1>Non-custodial Stellar payments — for people, and for AI agents.</h1>
+        <h1>Non-custodial Stellar payments, for merchants and for machines.</h1>
         <p className="lead">
-          Konfirm independently verifies every payment on-chain before it&apos;s ever marked paid —
-          whether that&apos;s a customer paying a merchant, or one AI agent paying another thousands
-          of times a second.
+          Konfirm checks every payment on-chain before it&apos;s ever marked paid — whether
+          that&apos;s a customer paying your store, or one AI agent paying another thousands of
+          times a second.
         </p>
         <div className="cta-row">
           <Link href="/signup" className="btn-primary">
@@ -57,44 +56,18 @@ export default async function RootPage() {
           </Link>
         </div>
 
-        <div className="channel-viz">
-          <div className="channel-nodes">
-            <div className="channel-node">
-              <span className="dot">A</span>agent_7f2a
-            </div>
-            <div className="channel-line" />
-            <div className="channel-node">
-              <span className="dot">B</span>agent_c91e
-            </div>
-          </div>
-          <div className="channel-feed">
-            <div>
-              <span className="ok">✓ commit</span> agent_7f2a → agent_c91e ·{" "}
-              <span className="amt">0.0004 USDC</span> · off-chain
-            </div>
-            <div>
-              <span className="ok">✓ commit</span> agent_c91e → agent_7f2a ·{" "}
-              <span className="amt">0.0002 USDC</span> · off-chain
-            </div>
-            <div>
-              <span className="ok">✓ settle</span> channel close ·{" "}
-              <span className="amt">1 on-chain tx</span> · Soroban
-            </div>
-          </div>
-        </div>
-
-        <div className="proof-strip">
-          <div className="proof-item">
+        <div className="proof-row">
+          <div className="proof-card">
             <span className="num">2-of-3</span>
-            <span className="label">multisig treasury</span>
+            <span className="label">Multisig treasury signs every payout — no single key controls your funds.</span>
           </div>
-          <div className="proof-item">
+          <div className="proof-card">
             <span className="num">100%</span>
-            <span className="label">reconciled against Horizon</span>
+            <span className="label">Of payments independently reconciled against Horizon before they&apos;re marked paid.</span>
           </div>
-          <div className="proof-item">
-            <span className="num">0</span>
-            <span className="label">custody of your funds</span>
+          <div className="proof-card">
+            <span className="num">$0</span>
+            <span className="label">Held by Konfirm. Funds settle straight to your own Stellar address.</span>
           </div>
         </div>
       </section>
@@ -121,13 +94,28 @@ export default async function RootPage() {
           <h2>Built for AI agents paying AI agents, at machine speed.</h2>
           <p>
             Stripe and Coinbase Commerce weren&apos;t built for agent-to-agent API micropayments.
-            Konfirm&apos;s Soroban payment-channel contract lets two agents open a channel, transact
-            off-chain at high frequency, and settle on-chain only once — at close.
+            Konfirm&apos;s Soroban payment-channel contract lets two agents transact off-chain at
+            high frequency and settle on-chain once, at close.
           </p>
+          <div className="flow-steps" aria-hidden="true">
+            <div className="flow-step">
+              <span className="flow-num">1</span>
+              <span className="flow-label">Open a channel</span>
+            </div>
+            <span className="flow-arrow">→</span>
+            <div className="flow-step">
+              <span className="flow-num">2</span>
+              <span className="flow-label">Commit off-chain, instantly</span>
+            </div>
+            <span className="flow-arrow">→</span>
+            <div className="flow-step">
+              <span className="flow-num">3</span>
+              <span className="flow-label">Settle once, on-chain</span>
+            </div>
+          </div>
           <ul>
-            <li>Off-chain commits, single on-chain settlement</li>
-            <li>Built for the x402 pattern of agent-to-agent API micropayments</li>
-            <li>The differentiator neither Stripe nor Coinbase Commerce address</li>
+            <li>Built for the x402 pattern used by paid AI APIs</li>
+            <li>One on-chain settlement, regardless of commit volume</li>
           </ul>
         </div>
       </div>

@@ -44,13 +44,20 @@ function formatDaysLeft(days: number): string {
 
 function PromoBanner({ promo }: { promo: Promo }) {
   if (!promo.active) {
-    return <div className="admin-section hint">Your promotional rate has ended — standard fees now apply.</div>;
+    // Plain text, intentionally — nothing actionable, no border needed.
+    return <div className="hint" style={{ marginBottom: 24 }}>Your promotional rate has ended — standard fees now apply.</div>;
   }
   const isFree = promo.feeBps === 0;
   const label = isFree ? "0% fees" : `${(promo.feeBps! / 100).toFixed(2)}% fees`;
   return (
-    <div className="admin-section" style={{ borderColor: "var(--accent, #5b8def)" }}>
-      <div style={{ fontWeight: 600, marginBottom: 4 }}>{label} active{promo.expiresAt ? ` — ${formatDaysLeft(daysLeft(promo.expiresAt))}` : ""}</div>
+    // `.admin-section` is a plain layout spacer with no border of its own (other
+    // pages nest already-bordered cards inside it) — using it here as a banner
+    // meant an inline `borderColor` had nothing to draw on and was invisible.
+    // `.callout` is the component actually built for a bordered info banner.
+    <div className="callout" style={{ borderColor: "var(--accent)", marginBottom: 24 }}>
+      <div style={{ fontWeight: 600, marginBottom: 4, color: "var(--text-hi)" }}>
+        {label} active{promo.expiresAt ? ` — ${formatDaysLeft(daysLeft(promo.expiresAt))}` : ""}
+      </div>
       {promo.volumeCapUsdc && (
         <div className="hint">
           {formatAmount(promo.volumeSoFarUsdc, "USDC")} of {formatAmount(promo.volumeCapUsdc, "USDC")} processed at this rate

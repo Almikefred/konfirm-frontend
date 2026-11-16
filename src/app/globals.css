@@ -1,19 +1,34 @@
+/*
+ * Design tokens — light, editorial-fintech palette (see docs/UI redesign notes).
+ * Values chosen and verified against WCAG AA (4.5:1 normal text / 3:1 large
+ * text) with a small contrast script; see PR description for the numbers.
+ * Replaces an earlier dark near-black/gold+teal theme the product owner
+ * rejected on sight — this is a different direction, not a recolor of it.
+ */
 :root {
-  color-scheme: dark;
-  --ink: #0a0908;
-  --surface: #17140f;
-  --surface-2: #1e1a14;
-  --border: #2b251c;
-  --text-hi: #f5f3ee;
-  --text-lo: #b6ada0;
-  --text-faint: #8f8878;
-  --accent: #c3a06a;
-  --accent-ink: #1a1408;
-  --signal: #5fd4c4;
-  --signal-ink: #04231f;
-  --success: #3a9c7d;
-  --error: #d9704a;
-  --warn: #c98a3a;
+  color-scheme: light;
+
+  /* Surfaces */
+  --ink: #f6f5f2; /* page background — warm off-white, not stark white */
+  --surface: #ffffff; /* cards, nav, elevated panels */
+  --surface-2: #f1f0ea; /* inset fields: inputs, chips, callouts */
+  --border: #d8d3c3; /* hairline borders */
+
+  /* Text */
+  --text-hi: #16140f; /* headings, primary text — 18.4:1 on --surface */
+  --text-lo: #5c5848; /* body copy, secondary text — 7.1:1 on --surface */
+  --text-faint: #6b6657; /* labels, captions, meta — 5.7:1 on --surface */
+
+  /* Brand */
+  --accent: #1d4ed8; /* primary — merchant payments */
+  --accent-ink: #ffffff; /* text/icons on --accent — 6.7:1 */
+  --signal: #7c3aed; /* secondary — agentic/x402 */
+  --signal-ink: #ffffff; /* text/icons on --signal — 5.7:1 */
+
+  /* Status */
+  --success: #0e7a3a; /* 5.4:1 on --surface */
+  --error: #b91c1c; /* 6.5:1 on --surface */
+  --warn: #9a4a08; /* 6.3:1 on --surface */
 }
 
 * {
@@ -55,7 +70,9 @@ body {
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 32px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  box-shadow:
+    0 1px 2px rgba(22, 20, 15, 0.04),
+    0 16px 40px rgba(22, 20, 15, 0.08);
 }
 
 .card.narrow {
@@ -281,6 +298,32 @@ button.secondary {
   display: none;
 }
 
+/* Screen-reader-only content (e.g. a visible chart's data table, a label for
+   a visually-obvious input) — present in the accessibility tree, removed
+   from layout. Previously referenced by a couple of pages with no matching
+   rule, so that content rendered fully visible instead of being sr-only. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Every interactive element gets a consistent, visible keyboard-focus
+   indicator — inputs/selects already set their own above. */
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 /* Currency toggle (new, cashout) */
 .currency-toggle {
   display: flex;
@@ -451,6 +494,9 @@ input.amount-input:focus {
 a.qr-box {
   display: inline-block;
   background: #fff;
+  /* A plain white box needs its own border now that cards are white too —
+     without it the QR box had no visible edge against the card at all. */
+  border: 1px solid var(--border);
   padding: 12px;
   border-radius: 12px;
   line-height: 0;
@@ -727,8 +773,14 @@ a.txlink {
   .waiting-banner .spin,
   .progress .spin,
   .live-dot span.d,
-  .channel-node .dot {
+  /* Every new payment landing fades/slides in via `land` — this ran on every
+     live-poll update regardless of motion preference until now. */
+  .payment {
     animation: none;
+  }
+  /* Mobile admin-nav drawer slides in/out — respect reduced motion too. */
+  .admin-sidebar {
+    transition: none;
   }
 }
 
@@ -737,6 +789,18 @@ a.txlink {
   display: flex;
   min-height: 100vh;
   min-height: 100dvh;
+  position: relative;
+}
+/* Hamburger + backdrop for the mobile off-canvas nav drawer — hidden on
+   desktop, where the sidebar is always visible. See the ≤768px breakpoint
+   below for the drawer itself. These two elements already existed in the
+   admin layout's markup with no matching CSS at all, so the toggle button
+   rendered as a bare, unstyled "☰"/"✕" and the backdrop never appeared. */
+.admin-sidebar-toggle {
+  display: none;
+}
+.admin-sidebar-backdrop {
+  display: none;
 }
 .admin-sidebar {
   width: 220px;
@@ -962,6 +1026,44 @@ a.txlink {
   border-color: var(--accent);
 }
 
+/* Pagination row used at the bottom of every paginated admin table (payments,
+   merchants, users, pay-links, x402 settlements, notifications). Several of
+   these pass the "Load more" button no class at all, which meant it fell
+   back to the base `button` rule — full width, pill radius, no background —
+   inside what's meant to be a compact inline row. */
+.admin-pagination,
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--text-lo);
+}
+.admin-pagination button,
+.pagination button {
+  width: auto;
+  min-height: 40px;
+  padding: 8px 16px;
+  margin: 0;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-hi);
+  font-size: 13px;
+  font-weight: 600;
+}
+.admin-pagination button:hover,
+.pagination button:hover {
+  border-color: var(--accent);
+}
+.admin-pagination button:disabled,
+.pagination button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .filter-pills {
   display: flex;
   flex-wrap: wrap;
@@ -999,19 +1101,22 @@ a.txlink {
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
+/* Tint backgrounds recomputed for the new --success/--error/--warn (12%
+   over white) so the pill text keeps ≥4.5:1 contrast on its own tint —
+   the old 15%-opacity dark-theme tints, left as-is, landed at ~4.1:1. */
 .status-pill.active {
-  background: rgba(58, 156, 125, 0.15);
+  background: rgba(14, 122, 58, 0.12);
   color: var(--success);
 }
 .status-pill.suspended {
-  background: rgba(217, 112, 74, 0.15);
+  background: rgba(185, 28, 28, 0.12);
   color: var(--error);
 }
 .status-pill.paid,
 .status-pill.completed,
 .status-pill.settled,
 .status-pill.approved {
-  background: rgba(58, 156, 125, 0.15);
+  background: rgba(14, 122, 58, 0.12);
   color: var(--success);
 }
 .status-pill.disputed,
@@ -1020,7 +1125,7 @@ a.txlink {
 .status-pill.refunded,
 .status-pill.failed,
 .status-pill.rejected {
-  background: rgba(217, 112, 74, 0.15);
+  background: rgba(185, 28, 28, 0.12);
   color: var(--error);
 }
 .status-pill.held,
@@ -1032,8 +1137,12 @@ a.txlink {
 .status-pill.pending_user,
 .status-pill.on_hold,
 .status-pill.incomplete {
-  background: rgba(201, 138, 58, 0.15);
+  background: rgba(154, 74, 8, 0.12);
   color: var(--warn);
+}
+.status-pill.inactive {
+  background: var(--surface-2);
+  color: var(--text-faint);
 }
 
 .activity-feed {
@@ -1133,21 +1242,8 @@ a.txlink {
 
 .landing-hero {
   text-align: center;
-  margin-bottom: 72px;
+  margin-bottom: 56px;
   position: relative;
-}
-.hero-glow {
-  position: absolute;
-  top: -120px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 820px;
-  height: 440px;
-  pointer-events: none;
-  filter: blur(10px);
-  background:
-    radial-gradient(ellipse at 35% 40%, rgba(195, 160, 106, 0.14) 0%, transparent 60%),
-    radial-gradient(ellipse at 65% 60%, rgba(95, 212, 196, 0.14) 0%, transparent 60%);
 }
 .landing-badge {
   position: relative;
@@ -1185,126 +1281,112 @@ a.txlink {
   flex-wrap: wrap;
 }
 
-/* Live agent-channel visualization — the actual x402 differentiator, shown
-   not told. CSS-only, no JS/animation library dependency. */
-.channel-viz {
-  position: relative;
-  max-width: 560px;
-  margin: 48px auto 0;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 28px 24px;
-  text-align: left;
-}
-.channel-nodes {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 18px;
-}
-.channel-node {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  font-family: ui-monospace, "SF Mono", Menlo, monospace;
-  color: var(--text-faint);
-}
-.channel-node .dot {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--signal-ink);
-  border: 2px solid var(--signal);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  color: var(--signal);
-  animation: channel-pulse 1.8s infinite;
-}
-@keyframes channel-pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(95, 212, 196, 0.35);
-  }
-  50% {
-    box-shadow: 0 0 0 8px rgba(95, 212, 196, 0);
-  }
-}
-.channel-line {
-  flex: 1;
-  height: 2px;
-  background: linear-gradient(90deg, var(--signal), var(--accent));
-  margin: 0 14px;
-  position: relative;
-  top: -20px;
-  opacity: 0.6;
-}
-.channel-feed {
-  font-family: ui-monospace, "SF Mono", Menlo, monospace;
-  font-size: 12px;
-  color: var(--text-lo);
-  line-height: 1.8;
-  border-top: 1px solid var(--border);
-  padding-top: 14px;
-}
-.channel-feed .ok {
-  color: var(--signal);
-}
-.channel-feed .amt {
-  color: var(--text-hi);
-}
-
-.proof-strip {
-  position: relative;
+/* Three honest, verifiable facts about how Konfirm handles money — not
+   usage/scale numbers, since there are none yet (pre-launch, testnet-only).
+   A static row of small cards, no animation. */
+.proof-row {
   display: flex;
   justify-content: center;
-  gap: 56px;
-  margin: 40px auto 0;
-  padding-top: 32px;
-  border-top: 1px solid var(--border);
-  max-width: 640px;
+  gap: 16px;
+  margin: 44px auto 0;
+  max-width: 740px;
   flex-wrap: wrap;
 }
-.proof-item {
+.proof-card {
+  flex: 1 1 200px;
+  max-width: 230px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 18px;
   text-align: center;
 }
-.proof-item .num {
-  font-weight: 700;
+.proof-card .num {
+  display: block;
+  font-weight: 800;
   font-size: 26px;
   font-variant-numeric: tabular-nums;
-  color: var(--text-hi);
-  display: block;
-  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+  color: var(--accent);
+  margin-bottom: 6px;
 }
-.proof-item .label {
-  font-size: 12.5px;
-  color: var(--text-faint);
+.proof-card .label {
+  font-size: 13px;
+  color: var(--text-lo);
+  line-height: 1.45;
 }
-a.btn-primary,
-a.btn-secondary {
+
+/* Static 3-step flow inside the agentic feature card — shows the
+   open/commit/settle mechanism without an animated diagram. */
+.flow-steps {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 18px 0;
+  flex-wrap: wrap;
+}
+.flow-step {
+  flex: 1 1 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.flow-step .flow-num {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--signal);
+  color: var(--signal-ink);
+  font-size: 11px;
+  font-weight: 700;
+  flex: none;
+}
+.flow-step .flow-label {
+  font-size: 12.5px;
+  color: var(--text-lo);
+  line-height: 1.4;
+}
+.flow-arrow {
+  display: flex;
+  align-items: center;
+  color: var(--text-faint);
+  font-size: 15px;
+  padding-top: 3px;
+  flex: none;
+}
+/* Not `a.btn-secondary` — a <button className="btn-secondary"> (used for an
+   inline "Load more" action) needs the same look, and a class selector
+   already outranks the base `button { width: 100% }` rule below it. */
+.btn-primary,
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
   min-height: 48px;
   padding: 0 28px;
+  margin: 0;
+  border: none;
   border-radius: 999px;
   font-size: 15px;
   font-weight: 700;
+  font-family: inherit;
   text-decoration: none;
+  cursor: pointer;
 }
-a.btn-primary {
+.btn-primary {
   background: var(--accent);
   color: var(--accent-ink);
 }
-a.btn-secondary {
+.btn-secondary {
   border: 1px solid var(--border);
+  background: transparent;
   color: var(--text-hi);
 }
-a.btn-secondary:hover {
+.btn-secondary:hover {
   border-color: var(--accent);
 }
 
@@ -1352,19 +1434,6 @@ a.btn-secondary:hover {
   line-height: 1.7;
 }
 
-.landing-status {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 18px 22px;
-  font-size: 13.5px;
-  color: var(--text-lo);
-  line-height: 1.6;
-}
-.landing-status strong {
-  color: var(--text-hi);
-}
-
 .landing-footer {
   margin-top: 56px;
   text-align: center;
@@ -1394,7 +1463,7 @@ a.btn-secondary:hover {
 /* Forced colors: give the landing CTAs/badges the same explicit-border
    treatment as the other accent-only controls above. */
 @media (forced-colors: active) {
-  a.btn-primary {
+  .btn-primary {
     border: 2px solid ButtonText;
   }
   .landing-nav .nav-links a.cta {
@@ -1404,24 +1473,58 @@ a.btn-secondary:hover {
 
 /* ── Responsive breakpoints ────────────────────────────────────────────────── */
 
-/* Tablet: ≤ 768 px */
+/* Tablet/phone: ≤ 768 px — the sidebar becomes an off-canvas drawer, opened
+   by the hamburger button and closed by the backdrop, Escape-free-form
+   click-outside, or the same button again (all already wired up in
+   admin/layout.tsx; this is the CSS that was missing for it). With ~20 nav
+   links across 4 groups, wrapping them into a horizontal bar (the previous
+   approach) was impractical at phone width. */
 @media (max-width: 768px) {
-  .admin-shell {
-    flex-direction: column;
+  .admin-sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 60;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    margin: 0;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-hi);
+    font-size: 18px;
+    box-shadow: 0 2px 8px rgba(22, 20, 15, 0.1);
   }
   .admin-sidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    padding: 16px 20px;
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: min(80vw, 300px);
+    z-index: 50;
+    border-right: 1px solid var(--border);
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    overflow-y: auto;
   }
-  .admin-sidebar nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
+  .admin-shell.sidebar-open .admin-sidebar {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(22, 20, 15, 0.12);
+  }
+  .sidebar-open .admin-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    border: none;
+    padding: 0;
+    margin: 0;
+    background: rgba(22, 20, 15, 0.32);
   }
   .admin-main {
-    padding: 20px 16px;
+    padding: 76px 16px 20px;
   }
   .admin-main h1 {
     font-size: 22px;
