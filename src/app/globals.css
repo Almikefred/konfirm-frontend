@@ -1298,11 +1298,10 @@ a.txlink {
 }
 
 /* Public landing page ("/" for unauthenticated visitors) -- structure and
-   typographic emphasis device (bold sans headline + a trailing light-weight
-   italic serif phrase, repeated on every major section head) per product
-   direction. No stock/lifestyle photography: instead of a photo hero, the
-   hero uses the serif-emphasis
-   device plus a purely decorative abstract gradient (see .hero-blobs) —
+   typographic emphasis device (bold sans headline, one consistent weight,
+   with the trailing phrase picked out by color alone -- no italics, no
+   second typeface). No stock/lifestyle photography: instead of a photo
+   hero, the hero uses a full-bleed abstract gradient (see .hero-blobs) —
    Konfirm has no real customer/agent photos to show and fabricating any
    would be dishonest for a pre-launch product. Everything below reuses the
    existing light/dark tokens from :root above; no new colors were
@@ -1376,18 +1375,61 @@ a.txlink {
   padding-top: 24px;
 }
 /* Purely decorative, aria-hidden abstract gradient -- the hero's visual
-   anchor in place of a lifestyle photo. Low-opacity accent/signal blobs
-   behind the headline; never carries text, so it has no contrast
-   requirement of its own, and it never changes the text colors above it. */
+   anchor in place of a lifestyle photo. Full-bleed: `.landing` is centered
+   by `margin: 0 auto`, so `left: 50%` here already lands on the viewport's
+   own center, and `width: 100vw` + `translateX(-50%)` spans edge to edge
+   regardless of the 980px content column. A diagonal band of color stops
+   (not a circle) plus a tighter, lighter highlight band next to it is what
+   gives the ribbon its folded, dimensional look -- same technique as a CSS
+   "glossy stripe," just at hero scale. It never carries text, so it has no
+   contrast requirement of its own, and it never changes the text colors
+   above it. */
 .hero-blobs {
   position: absolute;
-  inset: -40px -24px auto -24px;
-  height: 320px;
+  left: 50%;
+  top: -72px;
+  width: 100vw;
+  height: 480px;
+  transform: translateX(-50%);
   z-index: -1;
   background:
-    radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 60%),
-    radial-gradient(circle at 80% 10%, color-mix(in srgb, var(--signal) 18%, transparent), transparent 55%);
-  filter: blur(8px);
+    linear-gradient(
+      118deg,
+      transparent 0%,
+      transparent 34%,
+      color-mix(in srgb, white 55%, transparent) 41%,
+      color-mix(in srgb, var(--accent) 88%, transparent) 47%,
+      color-mix(in srgb, var(--signal) 85%, transparent) 57%,
+      color-mix(in srgb, var(--success) 65%, transparent) 65%,
+      transparent 74%,
+      transparent 100%
+    ),
+    radial-gradient(circle at 12% 15%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 55%),
+    radial-gradient(circle at 88% 8%, color-mix(in srgb, var(--signal) 12%, transparent), transparent 55%);
+  filter: blur(22px) saturate(1.3);
+  opacity: 0.9;
+  mask-image: linear-gradient(to bottom, black 0%, black 50%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 50%, transparent 100%);
+  pointer-events: none;
+}
+/* The ribbon's brightest band runs right through the headline/lead column
+   (both are centered, so there's no "off to one side" text placement to
+   dodge it with). This recedes the ribbon specifically behind that text --
+   measured against real rendered pixels, the accent-colored headline
+   clause over the raw ribbon came out at ~1.5:1 contrast, nowhere near the
+   3:1 floor for large text. DOM order (not z-index) keeps this above
+   .hero-blobs (z-index: -1) and below the badge/h1/lead (z-index: auto in
+   the same stacking context paints later-in-DOM siblings on top). */
+.hero-scrim {
+  position: absolute;
+  inset: -40px 0 auto 0;
+  height: 420px;
+  background: radial-gradient(
+    ellipse 640px 300px at 50% 260px,
+    var(--ink) 0%,
+    color-mix(in srgb, var(--ink) 88%, transparent) 50%,
+    transparent 85%
+  );
   pointer-events: none;
 }
 .landing-badge {
@@ -1459,14 +1501,14 @@ a.txlink {
   text-decoration: underline;
 }
 
-/* Bold-sans + light italic-serif emphasis -- the repeated headline device
-   used across every major section head. Falls back to an italic system
-   serif if the Google font hasn't loaded yet / fails, so the pairing still
-   reads correctly either way. */
-.serif-em {
-  font-family: var(--font-serif-display), Georgia, "Times New Roman", serif;
-  font-style: italic;
-  font-weight: 400;
+/* Color-only emphasis -- the repeated headline device used across every
+   major section head. Same typeface and weight as the rest of the
+   heading (inherits it) so there's never a second font or an italic; the
+   trailing phrase is picked out by --accent alone. */
+.accent-em {
+  color: var(--accent);
+  font-weight: inherit;
+  font-style: normal;
 }
 
 .landing-section {
@@ -1508,12 +1550,11 @@ a.txlink {
   position: absolute;
   top: 10px;
   right: 18px;
-  font-family: var(--font-serif-display), Georgia, serif;
-  font-style: italic;
-  font-size: 48px;
+  font-weight: 800;
+  font-size: 44px;
   line-height: 1;
   color: var(--text-faint);
-  opacity: 0.35;
+  opacity: 0.3;
 }
 .feature-card .feature-icon {
   display: inline-flex;

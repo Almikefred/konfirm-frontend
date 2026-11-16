@@ -43,9 +43,10 @@ export default async function RootPage() {
 
       <section className="landing-hero">
         <div className="hero-blobs" aria-hidden="true" />
+        <div className="hero-scrim" aria-hidden="true" />
         <span className="landing-badge">Stellar testnet · pre-launch</span>
         <h1>
-          Get paid on Stellar, <em className="serif-em">checked before it counts.</em>
+          Get paid on Stellar, <span className="accent-em">checked before it counts.</span>
         </h1>
         <p className="lead">
           Konfirm checks every payment on-chain before it&apos;s ever marked paid — whether
@@ -70,7 +71,7 @@ export default async function RootPage() {
       <section id="features" className="landing-section">
         <div className="section-eyebrow">Why Konfirm</div>
         <h2 className="section-head">
-          Payments that prove themselves, <em className="serif-em">not just promise&nbsp;to.</em>
+          Payments that prove themselves, <span className="accent-em">not just promise&nbsp;to.</span>
         </h2>
 
         <div className="feature-grid">
@@ -132,7 +133,7 @@ export default async function RootPage() {
       <section className="landing-section">
         <div className="section-eyebrow">How it&apos;s built</div>
         <h2 className="section-head">
-          Custody you can verify, <em className="serif-em">not a promise you&apos;re asked to trust.</em>
+          Custody you can verify, <span className="accent-em">not a promise you&apos;re asked to trust.</span>
         </h2>
         <div className="proof-row">
           <div className="proof-card">
@@ -161,7 +162,7 @@ export default async function RootPage() {
       <section className="landing-section">
         <div className="section-eyebrow">Who it&apos;s for</div>
         <h2 className="section-head">
-          Two very different customers, <em className="serif-em">one honest ledger&nbsp;check.</em>
+          Two very different customers, <span className="accent-em">one honest ledger&nbsp;check.</span>
         </h2>
         <div className="split-grid">
           <div className="split-col">
@@ -207,7 +208,7 @@ export default async function RootPage() {
       <section id="faq" className="landing-section">
         <div className="section-eyebrow">FAQ</div>
         <h2 className="section-head">
-          Questions worth asking <em className="serif-em">before you integrate.</em>
+          Questions worth asking <span className="accent-em">before you integrate.</span>
         </h2>
         <div className="faq-list">
           <details className="faq-item">
@@ -260,7 +261,7 @@ export default async function RootPage() {
 
       <section className="landing-section final-cta">
         <h2 className="section-head">
-          Start on testnet, <em className="serif-em">build like it&apos;s mainnet.</em>
+          Start on testnet, <span className="accent-em">build like it&apos;s mainnet.</span>
         </h2>
         <div className="cta-row">
           <Link href="/signup" className="btn-primary">
