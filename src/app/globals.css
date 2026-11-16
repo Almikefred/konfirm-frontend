@@ -1299,9 +1299,9 @@ a.txlink {
 
 /* Public landing page ("/" for unauthenticated visitors) -- structure and
    typographic emphasis device (bold sans headline + a trailing light-weight
-   italic serif phrase, repeated on every major section head) adapted from
-   useblinkapp.com's landing page per product direction. No stock/lifestyle
-   photography: instead of a photo hero, the hero uses the serif-emphasis
+   italic serif phrase, repeated on every major section head) per product
+   direction. No stock/lifestyle photography: instead of a photo hero, the
+   hero uses the serif-emphasis
    device plus a purely decorative abstract gradient (see .hero-blobs) —
    Konfirm has no real customer/agent photos to show and fabricating any
    would be dishonest for a pre-launch product. Everything below reuses the
@@ -1427,7 +1427,7 @@ a.txlink {
   flex-wrap: wrap;
 }
 
-/* The Blink-style "dark pill combining a line of copy and a CTA" -- this is
+/* The "dark pill combining a line of copy and a CTA" -- this is
    where the honest testnet/pre-launch framing lives now, folded into a
    forward-looking line + action rather than a standalone disclosure box
    (that box was explicitly removed in an earlier redesign for reading as
@@ -1460,9 +1460,9 @@ a.txlink {
 }
 
 /* Bold-sans + light italic-serif emphasis -- the repeated headline device
-   borrowed from the Blink reference. Falls back to an italic system serif
-   if the Google font hasn't loaded yet / fails, so the pairing still reads
-   correctly either way. */
+   used across every major section head. Falls back to an italic system
+   serif if the Google font hasn't loaded yet / fails, so the pairing still
+   reads correctly either way. */
 .serif-em {
   font-family: var(--font-serif-display), Georgia, "Times New Roman", serif;
   font-style: italic;
@@ -1637,8 +1637,8 @@ a.txlink {
   padding: 18px 0;
   margin: 88px 0;
   /* Full-bleed strip -- breaks out of .landing's centered max-width so the
-     ticker reads as an edge-to-edge band, like the rest of this page's
-     Blink-inspired sections, rather than stopping at the text column. */
+     ticker reads as an edge-to-edge band, matching the other full-bleed
+     sections on this page, rather than stopping at the text column. */
   width: 100vw;
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);

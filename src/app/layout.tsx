@@ -7,7 +7,7 @@ import ThemeToggle from "./ThemeToggle";
 // Self-hosted by Next at build time (no runtime request to Google Fonts).
 // Only the landing page's `.serif-em` / `.feature-num` rules read this
 // variable, so no other route changes font. Italic-only: it's used solely
-// for the Blink-style bold-sans/italic-serif headline emphasis device.
+// for the bold-sans/italic-serif headline emphasis device.
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
   weight: "400",
