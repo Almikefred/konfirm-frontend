@@ -1,11 +1,12 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { API_BASE, apiPost } from "@/lib/api";
 import { useRequireAuth } from "@/lib/useAuth";
 import { formatAmount } from "@/lib/format";
+import { shouldShowPollError } from "@/lib/poll";
 import FeeSettlement from "@/components/fee-settlement";
 
 type PaymentStatus = "paid" | "held" | "refunded" | "disputed";
@@ -86,6 +87,7 @@ function ActivityContent() {
   const [dateFilter, setDateFilter] = useState<DateRangePreset>("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [now, setNow] = useState<number | null>(null);
+  const consecutiveFailures = useRef(0);
 
   const poll = useCallback(async () => {
     if (!hasAddress) return;
@@ -95,7 +97,8 @@ function ActivityContent() {
         fetch(`${API_BASE}/payments/mine/pending`),
       ]);
       if (!paymentsRes.ok || !pendingRes.ok) {
-        setPollError(true);
+        consecutiveFailures.current += 1;
+        if (shouldShowPollError(consecutiveFailures.current, POLL_FAILURE_THRESHOLD)) setPollError(true);
         return;
       }
       const paymentsBody: Payment[] = await paymentsRes.json();
@@ -103,9 +106,11 @@ function ActivityContent() {
       setPayments(paymentsBody);
       setPending(Boolean(pendingBody.pending));
       setNow(Date.now());
+      consecutiveFailures.current = 0;
       setPollError(false);
     } catch {
-      setPollError(true);
+      consecutiveFailures.current += 1;
+      if (shouldShowPollError(consecutiveFailures.current, POLL_FAILURE_THRESHOLD)) setPollError(true);
     }
   }, [hasAddress]);
 
