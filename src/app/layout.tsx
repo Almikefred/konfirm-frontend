@@ -1,20 +1,7 @@
 import type { Metadata } from "next";
-import { Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import RouteAnnouncer from "./RouteAnnouncer";
 import ThemeToggle from "./ThemeToggle";
-
-// Self-hosted by Next at build time (no runtime request to Google Fonts).
-// Only the landing page's `.serif-em` / `.feature-num` rules read this
-// variable, so no other route changes font. Italic-only: it's used solely
-// for the bold-sans/italic-serif headline emphasis device.
-const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
-  weight: "400",
-  style: "italic",
-  variable: "--font-serif-display",
-  display: "swap",
-});
 
 // Runs before paint so an explicit saved preference applies immediately --
 // without this, the page would render in the system-preference theme for
@@ -39,7 +26,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={instrumentSerif.variable}>
+    <html lang="en">
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
