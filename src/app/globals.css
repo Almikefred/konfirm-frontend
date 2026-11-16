@@ -31,6 +31,80 @@
   --warn: #9a4a08; /* 6.3:1 on --surface */
 }
 
+/*
+ * Dark variant — same token names, same components, zero per-component
+ * overrides. --accent/--signal are lightened so they stay >=4.5:1 as text
+ * (the light theme's values only hit ~2.6:1 on a dark surface); --accent-ink/
+ * --signal-ink flip to dark so button labels stay readable against the now-
+ * lighter brand colors. Every rule in this file that reads these tokens for
+ * text, borders, or buttons gets the right contrast automatically.
+ * Follows system preference by default; [data-theme] is the explicit toggle
+ * override, set by ThemeToggle via localStorage + a pre-paint inline script
+ * in layout.tsx (avoids a flash of the wrong theme on load).
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ink: #14130f;
+    --surface: #1c1a16;
+    --surface-2: #221f1a;
+    --border: #3a362c;
+    --text-hi: #f5f3ee;
+    --text-lo: #b6ada0;
+    --text-faint: #8f8878;
+    --accent: #7aa8f5;
+    --accent-ink: #14130f;
+    --signal: #b49bf7;
+    --signal-ink: #14130f;
+    --success: #4ade80;
+    --error: #f87171;
+    --warn: #fb923c;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #14130f;
+  --surface: #1c1a16;
+  --surface-2: #221f1a;
+  --border: #3a362c;
+  --text-hi: #f5f3ee;
+  --text-lo: #b6ada0;
+  --text-faint: #8f8878;
+  --accent: #7aa8f5;
+  --accent-ink: #14130f;
+  --signal: #b49bf7;
+  --signal-ink: #14130f;
+  --success: #4ade80;
+  --error: #f87171;
+  --warn: #fb923c;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-lo);
+  cursor: pointer;
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 40;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+.theme-toggle:hover {
+  border-color: var(--accent);
+  color: var(--text-hi);
+}
+.theme-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
 * {
   box-sizing: border-box;
 }
