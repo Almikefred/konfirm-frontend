@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 const STORAGE_KEY = "konfirm_theme";
 
@@ -23,6 +24,7 @@ function currentTheme(): "light" | "dark" {
 
 export default function ThemeToggle() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
+  const pathname = usePathname();
 
   useEffect(() => {
     // document is unavailable during SSR; this reads back the real DOM
@@ -36,6 +38,12 @@ export default function ThemeToggle() {
     applyTheme(next);
     setTheme(next);
   };
+
+  // The landing page runs on Hallmark's Dusk system, which is dark-only
+  // (no light tokens defined) -- a toggle that visibly changes nothing is
+  // worse than no toggle. Hidden only here; every other route still has
+  // a real light/dark split (see globals.css) and keeps the control.
+  if (pathname === "/") return null;
 
   return (
     <button
