@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiPost } from "@/lib/api";
@@ -12,9 +12,16 @@ const RECENT_LINK_KEY = "konfirm:recentLink";
 const DRAFT_KEY = "konfirm:newPaymentDraft";
 
 const COPY_FEEDBACK_MS = 4000;
+const DRAFT_SAVE_DEBOUNCE_MS = 300;
 
 interface Merchant {
   name: string;
+}
+
+interface PaymentDraft {
+  amount: string;
+  currency: Currency;
+  description: string;
 }
 
 export default function NewPaymentPage() {
@@ -34,6 +41,44 @@ export default function NewPaymentPage() {
   const [copyAnnouncement, setCopyAnnouncement] = useState("");
   const [showResult, setShowResult] = useState(false);
   const inFlight = useRef(false);
+  const draftRestored = useRef(false);
+
+  // Restore any saved draft on mount so navigating away and back keeps the values.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(DRAFT_KEY);
+      if (raw) {
+        const draft = JSON.parse(raw) as Partial<PaymentDraft>;
+        if (typeof draft.amount === "string") setAmount(draft.amount);
+        if (typeof draft.description === "string") setDescription(draft.description);
+        if (draft.currency === "XLM" || draft.currency === "USDC" || draft.currency === "EURC") {
+          setCurrency(draft.currency);
+        }
+      }
+    } catch {
+      // sessionStorage unavailable or malformed draft — ignore
+    } finally {
+      draftRestored.current = true;
+    }
+  }, []);
+
+  // Persist the draft (debounced) as the user types, once the initial restore has run.
+  useEffect(() => {
+    if (!draftRestored.current) return;
+    const timer = setTimeout(() => {
+      try {
+        if (!amount && !description) {
+          sessionStorage.removeItem(DRAFT_KEY);
+          return;
+        }
+        const draft: PaymentDraft = { amount, currency, description };
+        sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+      } catch {
+        // sessionStorage unavailable — ignore
+      }
+    }, DRAFT_SAVE_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [amount, currency, description]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -228,7 +273,7 @@ export default function NewPaymentPage() {
               Request another payment
             </button>
             <Link className="secondary" href="/links">
-              View my payment links
+              View my payments
             </Link>
           </div>
         )}
