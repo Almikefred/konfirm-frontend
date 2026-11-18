@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import PasswordInput from "@/components/PasswordInput";
 import { API_BASE } from "@/lib/api";
@@ -9,10 +9,16 @@ import { reportError } from "@/lib/report-error";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  // Surface a distinct banner when the user was bounced here by a real
+  // session expiry (401), as opposed to a backend outage or network error.
+  const reason = searchParams.get("reason");
+  const sessionExpired = reason === "session_expired";
 
   // Already-authenticated visitors shouldn't see the login form — bounce
   // them straight to the app instead.
@@ -63,6 +69,11 @@ export default function LoginPage() {
           <span className="mark">✓</span> Konfirm
         </div>
         <h1 style={{ marginBottom: 22 }}>Log in</h1>
+        {sessionExpired && (
+          <div className="status error" role="alert" aria-live="assertive" style={{ marginBottom: 16 }}>
+            Your session expired. Please log in again.
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="field">
             <label htmlFor="email">Email</label>
