@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiPost } from "@/lib/api";
@@ -15,6 +15,39 @@ const COPY_FEEDBACK_MS = 4000;
 
 interface Merchant {
   name: string;
+}
+
+interface PaymentDraft {
+  amount: string;
+  currency: Currency;
+  description: string;
+}
+
+function readDraft(): PaymentDraft | null {
+  try {
+    const raw = sessionStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<PaymentDraft>;
+    const currency: Currency =
+      parsed.currency === "USDC" || parsed.currency === "EURC" || parsed.currency === "XLM"
+        ? parsed.currency
+        : "XLM";
+    return {
+      amount: typeof parsed.amount === "string" ? parsed.amount : "",
+      currency,
+      description: typeof parsed.description === "string" ? parsed.description : "",
+    };
+  } catch {
+    return null;
+  }
+}
+
+function writeDraft(draft: PaymentDraft) {
+  try {
+    sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+  } catch {
+    // sessionStorage unavailable — ignore
+  }
 }
 
 export default function NewPaymentPage() {
@@ -34,6 +67,15 @@ export default function NewPaymentPage() {
   const [copyAnnouncement, setCopyAnnouncement] = useState("");
   const [showResult, setShowResult] = useState(false);
   const inFlight = useRef(false);
+
+  // Restore any in-progress draft saved before a session-expiry redirect.
+  useEffect(() => {
+    const draft = readDraft();
+    if (!draft) return;
+    setAmount(draft.amount);
+    setCurrency(draft.currency);
+    setDescription(draft.description);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -65,7 +107,10 @@ export default function NewPaymentPage() {
       });
       if (!result.ok) {
         if (result.status === 401) {
-          router.push("/login");
+          // Preserve the in-progress form so nothing is lost across re-login.
+          writeDraft({ amount, currency, description });
+          setStatus("Your session has expired — please log in again. Your draft has been saved.");
+          router.push("/login?returnTo=%2Fnew");
           return;
         }
         const bodyMessage = (result.body as { message?: unknown } | null)?.message;
@@ -228,7 +273,7 @@ export default function NewPaymentPage() {
               Request another payment
             </button>
             <Link className="secondary" href="/links">
-              View my payment links
+              View my payme
             </Link>
           </div>
         )}

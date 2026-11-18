@@ -20,6 +20,11 @@ export default function LoginPage() {
   const reason = searchParams.get("reason");
   const sessionExpired = reason === "session_expired";
 
+  // Preserve the return path so a bounced user lands back where they were
+  // (e.g. /new with a restored draft) instead of the default /activity.
+  const rawNext = searchParams.get("next");
+  const nextPath = rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/activity";
+
   // Already-authenticated visitors shouldn't see the login form — bounce
   // them straight to the app instead.
   useEffect(() => {
@@ -28,7 +33,7 @@ export default function LoginPage() {
       try {
         const res = await fetch(`${API_BASE}/auth/me`, { credentials: "include" });
         if (!cancelled && res.ok) {
-          router.replace("/activity");
+          router.replace(nextPath);
         }
       } catch {
         // Ignore — just means we stay on the login page.
@@ -37,7 +42,7 @@ export default function LoginPage() {
     return () => {
       cancelled = true;
     };
-  }, [router]);
+  }, [router, nextPath]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -54,7 +59,7 @@ export default function LoginPage() {
       if (!res.ok) {
         throw new Error(typeof body.message === "string" ? body.message : "Could not log in. Please try again.");
       }
-      router.push("/activity");
+      router.push(nextPath);
     } catch (err) {
       reportError("login", err);
       setStatus(err instanceof Error ? err.message : "Could not log in. Please try again.");
