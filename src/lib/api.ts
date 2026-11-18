@@ -1,5 +1,14 @@
 // Every backend call goes through the same-origin proxy configured in
 // next.config.ts — never a direct cross-origin call to the NestJS server.
+//
+// COOKIE-FIDELITY NOTE (see next.config.ts): the proxy's ability to forward
+// multiple `Set-Cookie` headers (and comma-containing attributes like
+// `Expires`) unmangled is a property of Next's current external-rewrite
+// implementation (raw Node HTTP-level proxying), NOT a documented Next.js
+// contract. If the proxy is ever migrated to a Route Handler / `fetch()`-based
+// pattern, that path coalesces `Set-Cookie` via the Fetch `Headers`
+// abstraction and requires an explicit `splitCookiesString()` workaround.
+// The regression check for this lives in `src/lib/api.cookie-fidelity.test.ts`.
 export const API_BASE = "/api/backend";
 
 export interface ApiSuccess<T> {
