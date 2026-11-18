@@ -35,6 +35,7 @@ export default function NewPaymentPage() {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("");
+  const [amountInvalid, setAmountInvalid] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
   const [copyLabel, setCopyLabel] = useState("Copy");
@@ -84,19 +85,23 @@ export default function NewPaymentPage() {
     e.preventDefault();
     const amountRaw = amount.trim();
     setStatus("");
+    setAmountInvalid(false);
 
     if (!amountRaw) {
       setStatus("Enter an amount greater than 0.");
+      setAmountInvalid(true);
       return;
     }
 
     const amountNum = parseAmount(amountRaw);
     if (amountNum === null) {
       setStatus("Enter a valid amount, like 1234.56.");
+      setAmountInvalid(true);
       return;
     }
     if (amountNum <= 0) {
       setStatus("Enter an amount greater than 0.");
+      setAmountInvalid(true);
       return;
     }
 
@@ -211,6 +216,8 @@ export default function NewPaymentPage() {
                 autoFocus
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
+                aria-invalid={amountInvalid}
+                aria-describedby={amountInvalid ? "form-status" : undefined}
               />
             </div>
             <div className="currency-toggle">
@@ -249,7 +256,7 @@ export default function NewPaymentPage() {
             <button type="submit" className="primary" disabled={submitting}>
               {submitting ? "Creating…" : "Create payment link"}
             </button>
-            <div className={`status${status ? " error" : ""}`}>{status}</div>
+            <div id="form-status" className={`status${status ? " error" : ""}`}>{status}</div>
           </form>
         ) : (
           <div className="success-box">
