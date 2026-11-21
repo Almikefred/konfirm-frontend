@@ -3,9 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import PasswordInput from "@/components/PasswordInput";
-import { API_BASE } from "@/lib/api";
-import { reportError } from "@/lib/report-error";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,7 +11,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Surface a distinct banner when the user was bounced here by a real
   // session expiry (401), as opposed to a backend outage or network error.
@@ -46,32 +44,47 @@ export default function LoginPage() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setSubmitting(true);
     setStatus("");
+    setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/auth/login`, {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      const body = await res.json().catch(() => ({}));
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(typeof body.message === "string" ? body.message : "Could not log in. Please try again.");
+        setStatus(data.error || "Login failed");
+        return;
       }
       router.push(nextPath);
     } catch (err) {
       reportError("login", err);
       setStatus(err instanceof Error ? err.message : "Could not log in. Please try again.");
-      setSubmitting(false);
+    } finally {
+      setLoading(false);
+    }
     }
   }
 
+  const invalid = Boolean(status);
+
   return (
-    <div className="page-center">
-      <div className="card narrow">
-        <div className="brand" style={{ marginBottom: 24 }}>
-          <span className="mark">✓</span> Konfirm
+    <main className="auth">
+      <h1>Log in</h1>
+      <form onSubmit={onSubmit} noValidate>
+        <div className="field">
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            autoComplete="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            aria-invalid={invalid}
+            aria-describedby={invalid ? "form-status" : undefined}
+          />
         </div>
         <h1 style={{ marginBottom: 22 }}>Log in</h1>
         {sessionExpired && (
@@ -118,7 +131,16 @@ export default function LoginPage() {
           <br />
           New here? <Link href="/signup">Create an account</Link>
         </div>
-      </div>
-    </div>
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in…" : "Log in"}
+        </button>
+        <div id="form-status" className={`status${status ? " error" : ""}`}>
+          {status}
+        </div>
+      </form>
+      <p className="muted">
+        No account? <Link href="/signup">Sign up</Link>
+      </p>
+    </main>
   );
 }
